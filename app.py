@@ -1,16 +1,16 @@
 from distutils.log import debug
-from flask import Flask , request,render_template
+from flask import Flask , request,render_template,flash,redirect
 from main import run_classifier
 import os
 import random
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(),"images")
 app = Flask(__name__)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
-def specific_string(length):  
-    sample_string = 'pqrstuvasdasdaswxy' # define the specific string  
-    # define the condition for random string  
-    result = ''.join((random.choice(sample_string)) for x in range(length))  
-    print(" Randomly generated string is: ", result)  
+
 
 @app.route('/',methods=["GET","POST"])
 def home():
@@ -18,11 +18,15 @@ def home():
         print("hello")
         files = request.files
         image = files.get('file')
-        print(image)
-        imagePath = os.path.abspath(f'images/{image}')
-        with open(imagePath, 'wb') as f:
-            f.write(image.content)
-        print(run_classifier(imagePath))
+        
+        if image.filename == '':
+            flash("no image selected")
+            return redirect(request.url)
+        else:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            image_path = os.path.join(UPLOAD_FOLDER,filename)
+            print(run_classifier(image_path))
 
     return render_template('index.html')
 
