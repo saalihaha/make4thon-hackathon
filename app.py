@@ -1,40 +1,55 @@
-from flask import Flask , request,render_template
+from distutils.log import debug
+from flask import Flask , request,render_template,flash,redirect, url_for
 from main import run_classifier
 import os
 import random
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = os.path.join(os.getcwd(),"images")
 app = Flask(__name__)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+#token = ""
 
+songs = {
 
-def specific_string(length):  
-    sample_string = 'pqrstuvasdasdaswxy' # define the specific string  
-    # define the condition for random string  
-    result = ''.join((random.choice(sample_string)) for x in range(length))  
-    print(" Randomly generated string is: ", result)  
+    'Disgust':"7zpZFvJpcZC2uYgdSZNfuA",
+    'Fear':"405PXg1fJunIlSo75L78Kb",
+    'Happy':"4PY9rbCQSo2JvGdgREogIe",
+    'Neutral':"3C7FXzgUwDq7hY68lW5B2d", 
+    'Sad':"4YOfhHpjPB0tq29NPpDY3F", 
+    'Surprise':"7vatYrf39uVaZ8G2cVtEik"
+}
 
 @app.route('/',methods=["GET","POST"])
 def home():
     if request.method=="POST":
+       
         files = request.files
         image = files.get('file')
-        imagePath = os.path.abspath(f'images/{image}')
-        with open(imagePath, 'wb') as f:
-            f.write(image.content)
-        print(run_classifier(imagePath))
+        
+        if image.filename == '':
+            flash("no image selected")
+            return redirect(request.url)
+        else:
+            filename = secure_filename(image.filename)
+            image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            image_path = os.path.join(UPLOAD_FOLDER,filename)
+            mood = run_classifier(image_path)
+            print(mood)
+            # the first argument in url_for takes the function name, NOT the actual endpoint
+            return redirect(url_for("music", mood=songs[mood]))
 
     return render_template('index.html')
 
 
-@app.route('/music',methods=["GET","POST"])
-def music():
-    pagetitle = "Music"
-    return render_template('musicplayer.html')
+@app.route('/music/<mood>',methods=["GET","POST"])
+def music(mood):
+    
+    context = {
+        "mood":mood
+    }
+    return render_template('musicplayer.html',context=context)
 
 
 if __name__=='__main__':
-    app.run()
-
-'''
-if __name__=='__main__':
-    app.run('0.0.0.0',debug=True,ssl_context="adhoc")
-'''
-
+    app.run(debug=True)
