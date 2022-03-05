@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moodify</title>
+    <title>moodify</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <style>
+    body {
+        background: rgb(238,174,202);
+        background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+      }
     .root{
         width: 100vw;
         height: 100vh;
@@ -18,78 +22,29 @@
     #camera{
         width: 60%;
         height: 70%;
-        border: 2px solid black;
+        background: rgba( 255, 255, 255, 0.15 );
+        box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+        backdrop-filter: blur( 8px );
+        -webkit-backdrop-filter: blur( 8px );
+        border-radius: 10px;
+        border: 1px solid rgba( 255, 255, 255, 0.18 );
     }
 </style>
 <body>
     <div class="root">
-        <div id="camera"></div>
-        <button onclick="take_snapshot()">Click</button>
-        <form id="myAwesomeForm" method="post">
-            <input type="text" id="filename" name="filename" /> <!-- Filename -->
-        </form>
-    </div>
+       <form class="form" id="myForm">
+           <input type="file" id="inpFile"><br>
+           <button type="submit">Upload File</button>
+       </form>
+    <div>
+        
+    <script>
+        
+    </script>
+
+
 </body>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js"></script>
-<script>
 
-function dataURItoBlob(dataURI) {
-    // convert base64/URLEncoded data component to raw binary data held in a string
-    var byteString;
-    if (dataURI.split(',')[0].indexOf('base64') >= 0)
-        byteString = atob(dataURI.split(',')[1]);
-    else
-        byteString = unescape(dataURI.split(',')[1]);
-
-    // separate out the mime component
-    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-
-    // write the bytes of the string to a typed array
-    var ia = new Uint8Array(byteString.length);
-    for (var i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-    }
-
-    return new Blob([ia], {type:mimeString});
-}
-
-
-    //  loading webcam 
-    Webcam.set({
-        width:300,
-        height:300,
-        image_format:'jpeg',
-        jpeg_quality:90
-    })
-    Webcam.attach("#camera")
-    function take_snapshot(){
-        Webcam.snap(function(data_uri){
-            console.log(data_uri)
-            document.getElementById('camera').innerHTML = 
-            `<img src="${data_uri}"/>`
-            var blob = dataURItoBlob(data_uri);
-            const imgUrl = URL.createObjectURL(blob);
-            var data = new FormData()
-            data.append('file', imgUrl,'file')
-
-            fetch("{{url_for('home')}}", {
-                method: 'POST',
-                body: data
-
-            }).then(response => response.json()
-            ).then(json => {
-                console.log(json)
-            });
-            
-
-            
-            
-
-        })
-    }
-
-
-</script>
 </html>
