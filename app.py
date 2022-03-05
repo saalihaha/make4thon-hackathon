@@ -1,3 +1,4 @@
+from distutils.log import debug
 from flask import Flask , request,render_template
 from main import run_classifier
 import os
@@ -14,8 +15,10 @@ def specific_string(length):
 @app.route('/',methods=["GET","POST"])
 def home():
     if request.method=="POST":
+        print("hello")
         files = request.files
         image = files.get('file')
+        print(image)
         imagePath = os.path.abspath(f'images/{image}')
         with open(imagePath, 'wb') as f:
             f.write(image.content)
@@ -31,7 +34,7 @@ def music():
 
 
 if __name__=='__main__':
-    app.run()
+    app.run(debug=True)
 
 '''
 if __name__=='__main__':
