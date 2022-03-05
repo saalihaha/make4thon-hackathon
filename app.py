@@ -24,6 +24,17 @@ def home():
     return render_template('index.html')
 
 
+@app.route('/music',methods=["GET","POST"])
+def music():
+    pagetitle = "Music"
+    return render_template('musicplayer.html')
+
 
 if __name__=='__main__':
+    app.run()
+
+'''
+if __name__=='__main__':
     app.run('0.0.0.0',debug=True,ssl_context="adhoc")
+'''
+
